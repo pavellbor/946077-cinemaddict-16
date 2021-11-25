@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Павел Борисов](https://up.htmlacademy.ru/ecmascript/16/user/946077).
-* Наставник: `Неизвестно`.
+* Наставник: [Игорь Агапов](https://htmlacademy.ru/profile/id1034633).
 
 ---
 
