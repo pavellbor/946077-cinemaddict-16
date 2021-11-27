@@ -5,7 +5,7 @@ import { createFilmListTemplate } from './view/film-list-view.js';
 import { createFilmCardTemplate } from './view/film-card-view.js';
 import { createShowMoreButtonTemplate } from './view/show-more-button-view.js';
 import { createFilmTotalCountTemplate } from './view/film-total-count-view.js';
-import { renderTemplate, renderPosition } from './utils.js';
+import { renderTemplate, renderPosition } from './render.js';
 
 const CARD_COUNT = 5;
 
