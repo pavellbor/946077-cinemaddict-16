@@ -10,9 +10,10 @@ import { generateFilm } from './mock/film.js';
 import { createFilmPopupTemplate } from './view/film-popup-view.js';
 import { generateFilter } from './mock/filter.js';
 
-const CARD_COUNT = 20;
+const FILM_COUNT = 20;
+const FILM_COUNT_PER_STEP = 5;
 
-const films = Array.from({ length: CARD_COUNT }, generateFilm);
+const films = Array.from({ length: FILM_COUNT }, generateFilm);
 const filters = generateFilter(films);
 const watchedFilmCount = filters.find(({ name }) => name === 'history').count;
 
@@ -29,12 +30,46 @@ renderTemplate(siteMainElement, createFilmListTemplate(), renderPosition.BEFOREE
 const filmsListElement = siteMainElement.querySelector('.films-list');
 const filmsListContainerElement = filmsListElement.querySelector('.films-list__container');
 
-for (let i = 0; i < CARD_COUNT; i++) {
+
+for (let i = 0; i < Math.min(films.length, FILM_COUNT_PER_STEP); i++) {
   renderTemplate(filmsListContainerElement, createFilmCardTemplate(films[i]), renderPosition.BEFOREEND);
 }
 
-renderTemplate(filmsListElement, createShowMoreButtonTemplate(), renderPosition.BEFOREEND);
-renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(CARD_COUNT), renderPosition.BEFOREEND);
+if (films.length > FILM_COUNT_PER_STEP) {
+  let renderedFilmCount = FILM_COUNT_PER_STEP;
+
+  renderTemplate(filmsListElement, createShowMoreButtonTemplate(), renderPosition.BEFOREEND);
+
+  const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
+
+  showMoreButton.addEventListener('click', (evt) => {
+    evt.preventDefault();
+
+    films
+      .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP)
+      .forEach((film) => renderTemplate(filmsListContainerElement, createFilmCardTemplate(film), renderPosition.BEFOREEND));
+
+    renderedFilmCount += FILM_COUNT_PER_STEP;
+
+    if (renderedFilmCount >= films.length) {
+      showMoreButton.remove();
+    }
+  });
+}
+
+renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(FILM_COUNT), renderPosition.BEFOREEND);
 
 document.body.classList.add('hide-overflow');
 renderTemplate(siteFooterElement, createFilmPopupTemplate(films[0]), renderPosition.AFTEREND);
+
+const filmPopupElement = document.body.querySelector('.film-details');
+const filmPopupCloseButton = filmPopupElement.querySelector('.film-details__close-btn');
+
+filmPopupCloseButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+
+  document.body.classList.remove('hide-overflow');
+  filmPopupElement.remove();
+});
+
+
