@@ -4,12 +4,12 @@ import { getRandomInteger, getRandomItem, shuffle, getRandomItems } from '../uti
 import { POSTERS, AGE_RATING, GENRES, DESCRIPTION, NAMES, COUNTRIES } from '../const.js';
 
 const extractTitleFromPoster = (posterFileName) => {
-  return posterFileName.split('.')[0].split('-').join(' ');
+  const title = posterFileName.split('.')[0].split('-').join(' ');
+
+  return title.slice(0, 1).toUpperCase() + title.slice(1);
 };
 
-const generateTotalRating = () => {
-  return Number(`${getRandomInteger(0, 9)}.${getRandomInteger(0, 9)}`);
-};
+const generateTotalRating = () => `${getRandomInteger(0, 9)}.${getRandomInteger(0, 9)}`;
 
 const getRandomPastDate = (maxYearsGap = 0, maxDaysGap = 0) => {
   const yearsGap = getRandomInteger(0, maxYearsGap);
@@ -20,9 +20,9 @@ const getRandomPastDate = (maxYearsGap = 0, maxDaysGap = 0) => {
 
 const generateDescription = () => {
   const descriptions = DESCRIPTION.split('. ');
-  const descriptionCount = getRandomInteger(0, descriptions.length - 1);
+  const descriptionCount = getRandomInteger(1, descriptions.length - 1);
 
-  return shuffle(descriptions).slice(0, descriptionCount).join('. ');
+  return `${shuffle(descriptions).slice(0, descriptionCount).join('. ')}.`;
 };
 
 const generateFilmInfo = () => {
@@ -33,8 +33,8 @@ const generateFilmInfo = () => {
   const ageRating = getRandomItem(AGE_RATING);
   const releaseDate = getRandomPastDate(20, 365);
   const releaseCountry = getRandomItem(COUNTRIES);
-  const runtime = getRandomInteger(70, 120);
-  const genres = getRandomItem(GENRES);
+  const runtime = getRandomInteger(50, 120);
+  const genres = getRandomItems(GENRES);
   const description = generateDescription();
   const director = getRandomItem(NAMES);
   const writers = getRandomItems(NAMES);
@@ -58,13 +58,13 @@ const generateFilmInfo = () => {
 };
 
 const generateUserDetails = () => {
-  const isWish = Boolean(getRandomInteger(0, 1));
-  const isWatched = (isWish !== true) && Boolean(getRandomInteger(0, 1));
+  const isWatchlist = Boolean(getRandomInteger(0, 1));
+  const isWatched = Boolean(getRandomInteger(0, 1));
   const watchingDate = (isWatched === true) && getRandomPastDate(2, 365);
   const isFavorite = Boolean(getRandomInteger(0, 1));
 
   return {
-    isWish,
+    isWatchlist,
     isWatched,
     watchingDate,
     isFavorite,

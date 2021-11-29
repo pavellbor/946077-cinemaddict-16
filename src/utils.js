@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -15,13 +17,21 @@ export const shuffle = (arr) => {
   const arrCopy = arr.slice();
 
   for (let i = arrCopy.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [arrCopy[i], arrCopy[j]] = [arrCopy[j], arrCopy[i]];
   }
 
   return arrCopy;
 };
 
-export const getRandomItems = (arr) => {
-  return shuffle(arr).slice(0, getRandomInteger(0, arr.length - 1));
-}
+export const getRandomItems = (arr) => shuffle(arr).slice(0, getRandomInteger(1, arr.length - 1));
+
+export const humanizeRuntime = (runtime = 0) => {
+  const date = dayjs().startOf('day').minute(runtime);
+  const hours = Number(date.format('H'));
+  const minutes = Number(date.format('mm'));
+  const humanizedHours = (hours !== 0) ? `${hours}h` : '';
+  const humanizedMinutes = (minutes !== 0) ? `${minutes}m` : '';
+
+  return `${humanizedHours} ${humanizedMinutes}`.trim();
+};
