@@ -26,6 +26,14 @@ export const shuffle = (arr) => {
 
 export const getRandomItems = (arr) => shuffle(arr).slice(0, getRandomInteger(1, arr.length - 1));
 
+export const getRandomPastDate = (maxYearsGap = 0, maxDaysGap = 0) => {
+  const yearsGap = getRandomInteger(0, maxYearsGap);
+  const daysGap = getRandomInteger(0, maxDaysGap);
+  const minutesGap = getRandomInteger(0, 1000);
+
+  return dayjs().subtract(yearsGap, 'year').subtract(daysGap, 'day').subtract(minutesGap, 'minutes').toDate();
+};
+
 export const humanizeRuntime = (runtime = 0) => {
   const date = dayjs().startOf('day').minute(runtime);
   const hours = Number(date.format('H'));
@@ -35,3 +43,7 @@ export const humanizeRuntime = (runtime = 0) => {
 
   return `${humanizedHours} ${humanizedMinutes}`.trim();
 };
+
+export const humanizeReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
+
+export const humanizeCommentDate = (commentDate) => dayjs(commentDate).format('YYYY/MM/DD HH:mm');

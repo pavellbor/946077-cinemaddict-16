@@ -7,6 +7,7 @@ import { createShowMoreButtonTemplate } from './view/show-more-button-view.js';
 import { createFilmTotalCountTemplate } from './view/film-total-count-view.js';
 import { renderTemplate, renderPosition } from './render.js';
 import { generateFilm } from './mock/film.js';
+import { createFilmPopupTemplate } from './view/film-popup-view.js';
 
 const CARD_COUNT = 5;
 
@@ -14,7 +15,8 @@ const films = Array.from({length: CARD_COUNT}, generateFilm);
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
-const siteFooterStatisticsElement = document.querySelector('.footer__statistics');
+const siteFooterElement = document.querySelector('.footer');
+const footerStatisticsElement = document.querySelector('.footer__statistics');
 
 renderTemplate(siteHeaderElement, createUserRankTemplate(), renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createSiteMenuTemplate(), renderPosition.BEFOREEND);
@@ -29,4 +31,7 @@ for (let i = 0; i < CARD_COUNT; i++) {
 }
 
 renderTemplate(filmsListElement, createShowMoreButtonTemplate(), renderPosition.BEFOREEND);
-renderTemplate(siteFooterStatisticsElement, createFilmTotalCountTemplate(), renderPosition.BEFOREEND);
+renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(), renderPosition.BEFOREEND);
+
+document.body.classList.add('hide-overflow');
+renderTemplate(siteFooterElement, createFilmPopupTemplate(films[0]), renderPosition.AFTEREND);

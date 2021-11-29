@@ -3,7 +3,7 @@ import { humanizeRuntime } from '../utils';
 
 export const createFilmCardTemplate = (film) => {
   const {
-    comments,
+    commentsId,
     filmInfo: {
       title,
       totalRating,
@@ -24,7 +24,7 @@ export const createFilmCardTemplate = (film) => {
   const humanizedRuntime = humanizeRuntime(runtime);
   const genre = genres[0];
   const shortDescription = (description.length > 140) ? `${description.slice(0, 139)}...` : description;
-  const commentCount = comments.length;
+  const commentCount = commentsId.length;
 
   const watchlistClassName = isWatchlist
     ? 'film-card__controls-item--add-to-watchlist film-card__controls-item--active'

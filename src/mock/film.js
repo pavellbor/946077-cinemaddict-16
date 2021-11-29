@@ -1,6 +1,5 @@
-import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
-import { getRandomInteger, getRandomItem, shuffle, getRandomItems } from '../utils.js';
+import { getRandomInteger, getRandomItem, shuffle, getRandomItems, getRandomPastDate } from '../utils.js';
 import { POSTERS, AGE_RATING, GENRES, DESCRIPTION, NAMES, COUNTRIES } from '../const.js';
 
 const extractTitleFromPoster = (posterFileName) => {
@@ -10,13 +9,6 @@ const extractTitleFromPoster = (posterFileName) => {
 };
 
 const generateTotalRating = () => `${getRandomInteger(0, 9)}.${getRandomInteger(0, 9)}`;
-
-const getRandomPastDate = (maxYearsGap = 0, maxDaysGap = 0) => {
-  const yearsGap = getRandomInteger(0, maxYearsGap);
-  const daysGap = getRandomInteger(0, maxDaysGap);
-
-  return dayjs().subtract(yearsGap, 'year').subtract(daysGap, 'day').toDate();
-};
 
 const generateDescription = () => {
   const descriptions = DESCRIPTION.split('. ');
@@ -73,13 +65,13 @@ const generateUserDetails = () => {
 
 export const generateFilm = () => {
   const id = nanoid();
-  const comments = Array.from({ length: getRandomInteger(0, 50) }, nanoid);
+  const commentsId = Array.from({ length: getRandomInteger(0, 5) }, nanoid);
   const filmInfo = generateFilmInfo();
   const userDetails = generateUserDetails();
 
   return {
     id,
-    comments,
+    commentsId,
     filmInfo,
     userDetails,
   };
