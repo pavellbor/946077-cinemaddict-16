@@ -12,15 +12,16 @@ import { generateFilter } from './mock/filter.js';
 
 const CARD_COUNT = 20;
 
-const films = Array.from({length: CARD_COUNT}, generateFilm);
+const films = Array.from({ length: CARD_COUNT }, generateFilm);
 const filters = generateFilter(films);
+const watchedFilmCount = filters.find(({ name }) => name === 'history').count;
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 const footerStatisticsElement = document.querySelector('.footer__statistics');
 
-renderTemplate(siteHeaderElement, createUserRankTemplate(), renderPosition.BEFOREEND);
+renderTemplate(siteHeaderElement, createUserRankTemplate(watchedFilmCount), renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createFilterTemplate(filters), renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createSortTemplate(), renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createFilmListTemplate(), renderPosition.BEFOREEND);
@@ -33,7 +34,7 @@ for (let i = 0; i < CARD_COUNT; i++) {
 }
 
 renderTemplate(filmsListElement, createShowMoreButtonTemplate(), renderPosition.BEFOREEND);
-renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(), renderPosition.BEFOREEND);
+renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(CARD_COUNT), renderPosition.BEFOREEND);
 
 document.body.classList.add('hide-overflow');
 renderTemplate(siteFooterElement, createFilmPopupTemplate(films[0]), renderPosition.AFTEREND);
