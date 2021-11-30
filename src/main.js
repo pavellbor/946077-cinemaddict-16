@@ -1,32 +1,75 @@
-import { createUserRankTemplate } from "./view/user-rank-view.js";
-import { createSiteMenuTemplate } from "./view/site-menu-view.js";
-import { createSiteSortTemplate } from "./view/site-sort-view.js";
-import { createFilmListTemplate } from "./view/film-list-view.js";
-import { createFilmCardTemplate } from "./view/film-card-view.js";
-import { createShowMoreTemplate } from "./view/show-more-view.js";
-import { createFilmTotalCountTemplate } from "./view/film-total-count-view.js";
+import { createUserRankTemplate } from './view/user-rank-view.js';
+import { createFilterTemplate } from './view/filter-view.js';
+import { createSortTemplate } from './view/sort-view.js';
+import { createFilmListTemplate } from './view/film-list-view.js';
+import { createFilmCardTemplate } from './view/film-card-view.js';
+import { createShowMoreButtonTemplate } from './view/show-more-button-view.js';
+import { createFilmTotalCountTemplate } from './view/film-total-count-view.js';
+import { renderTemplate, renderPosition } from './render.js';
+import { generateFilm } from './mock/film.js';
+import { createFilmPopupTemplate } from './view/film-popup-view.js';
+import { generateFilter } from './mock/filter.js';
 
-const renderTemplate = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
+const FILM_COUNT = 20;
+const FILM_COUNT_PER_STEP = 5;
 
-const siteMainElement = document.querySelector('.main');
+const films = Array.from({ length: FILM_COUNT }, generateFilm);
+const filters = generateFilter(films);
+const watchedFilmCount = filters.find(({ name }) => name === 'history').count;
+
 const siteHeaderElement = document.querySelector('.header');
+const siteMainElement = document.querySelector('.main');
+const siteFooterElement = document.querySelector('.footer');
 const footerStatisticsElement = document.querySelector('.footer__statistics');
 
-const CARD_COUNT = 5
-
-renderTemplate(siteHeaderElement, createUserRankTemplate(), 'beforeend');
-renderTemplate(siteMainElement, createSiteMenuTemplate(), 'beforeend');
-renderTemplate(siteMainElement, createSiteSortTemplate(), 'beforeend');
-renderTemplate(siteMainElement, createFilmListTemplate(), 'beforeend');
+renderTemplate(siteHeaderElement, createUserRankTemplate(watchedFilmCount), renderPosition.BEFOREEND);
+renderTemplate(siteMainElement, createFilterTemplate(filters), renderPosition.BEFOREEND);
+renderTemplate(siteMainElement, createSortTemplate(), renderPosition.BEFOREEND);
+renderTemplate(siteMainElement, createFilmListTemplate(), renderPosition.BEFOREEND);
 
 const filmsListElement = siteMainElement.querySelector('.films-list');
 const filmsListContainerElement = filmsListElement.querySelector('.films-list__container');
 
-for (let i = 0; i < CARD_COUNT; i++) {
-  renderTemplate(filmsListContainerElement, createFilmCardTemplate(), 'beforeend');
+
+for (let i = 0; i < Math.min(films.length, FILM_COUNT_PER_STEP); i++) {
+  renderTemplate(filmsListContainerElement, createFilmCardTemplate(films[i]), renderPosition.BEFOREEND);
 }
 
-renderTemplate(filmsListElement, createShowMoreTemplate(), 'beforeend');
-renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(), 'beforeend');
+if (films.length > FILM_COUNT_PER_STEP) {
+  let renderedFilmCount = FILM_COUNT_PER_STEP;
+
+  renderTemplate(filmsListElement, createShowMoreButtonTemplate(), renderPosition.BEFOREEND);
+
+  const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
+
+  showMoreButton.addEventListener('click', (evt) => {
+    evt.preventDefault();
+
+    films
+      .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP)
+      .forEach((film) => renderTemplate(filmsListContainerElement, createFilmCardTemplate(film), renderPosition.BEFOREEND));
+
+    renderedFilmCount += FILM_COUNT_PER_STEP;
+
+    if (renderedFilmCount >= films.length) {
+      showMoreButton.remove();
+    }
+  });
+}
+
+renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(FILM_COUNT), renderPosition.BEFOREEND);
+
+document.body.classList.add('hide-overflow');
+renderTemplate(siteFooterElement, createFilmPopupTemplate(films[0]), renderPosition.AFTEREND);
+
+const filmPopupElement = document.body.querySelector('.film-details');
+const filmPopupCloseButton = filmPopupElement.querySelector('.film-details__close-btn');
+
+filmPopupCloseButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+
+  document.body.classList.remove('hide-overflow');
+  filmPopupElement.remove();
+});
+
+
