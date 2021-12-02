@@ -4,7 +4,7 @@ import SortView from './view/sort-view.js';
 import { createFilmListTemplate } from './view/film-list-view.js';
 import { createFilmCardTemplate } from './view/film-card-view.js';
 import ShowMoreButtonView from './view/show-more-button-view.js';
-import { createFilmTotalCountTemplate } from './view/film-total-count-view.js';
+import FilmTotalCountView from './view/film-total-count-view.js';
 import { renderTemplate, renderPosition, renderElement } from './render.js';
 import { generateFilm } from './mock/film.js';
 import { createFilmPopupTemplate } from './view/film-popup-view.js';
@@ -58,7 +58,7 @@ if (films.length > FILM_COUNT_PER_STEP) {
   });
 }
 
-renderTemplate(footerStatisticsElement, createFilmTotalCountTemplate(FILM_COUNT), renderPosition.BEFOREEND);
+renderElement(footerStatisticsElement, new FilmTotalCountView(FILM_COUNT).element, renderPosition.BEFOREEND);
 
 document.body.classList.add('hide-overflow');
 renderTemplate(siteFooterElement, createFilmPopupTemplate(films[0]), renderPosition.AFTEREND);
