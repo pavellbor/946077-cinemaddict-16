@@ -22,6 +22,36 @@ const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 const footerStatisticsElement = document.querySelector('.footer__statistics');
 
+const renderFilm = (container, film) => {
+  const filmCardComponent = new FilmCardView(film);
+  const filmPopupViewComponent = new FilmPopupView(film);
+
+  const showPopup = () => {
+    document.body.classList.add('hide-overflow');
+
+    render(siteFooterElement, filmPopupViewComponent.element, renderPosition.AFTEREND);
+  };
+
+  const closePopup = () => {
+    document.body.classList.remove('hide-overflow');
+
+    filmPopupViewComponent.element.remove();
+    filmPopupViewComponent.removeElement();
+  };
+
+  filmCardComponent.element.querySelector('.film-card__link').addEventListener('click', (evt) => {
+    evt.preventDefault();
+    showPopup();
+  });
+
+  filmPopupViewComponent.element.querySelector('.film-details__close-btn').addEventListener('click', (evt) => {
+    evt.preventDefault();
+    closePopup();
+  });
+
+  render(container, filmCardComponent.element, renderPosition.BEFOREEND);
+};
+
 render(siteHeaderElement, new UserRankView(watchedFilmCount).element, renderPosition.BEFOREEND);
 render(siteMainElement, new FilterView(filters).element, renderPosition.BEFOREEND);
 render(siteMainElement, new SortView().element, renderPosition.BEFOREEND);
@@ -34,7 +64,7 @@ const filmsListContainerElement = filmListComponent.element.querySelector('.film
 
 
 for (let i = 0; i < Math.min(films.length, FILM_COUNT_PER_STEP); i++) {
-  render(filmsListContainerElement, new FilmCardView(films[i]).element, renderPosition.BEFOREEND);
+  renderFilm(filmsListContainerElement, films[i]);
 }
 
 if (films.length > FILM_COUNT_PER_STEP) {
@@ -49,7 +79,7 @@ if (films.length > FILM_COUNT_PER_STEP) {
 
     films
       .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP)
-      .forEach((film) => render(filmsListContainerElement, new FilmCardView(film).element, renderPosition.BEFOREEND));
+      .forEach((film) => renderFilm(filmsListContainerElement, film));
 
     renderedFilmCount += FILM_COUNT_PER_STEP;
 
@@ -61,21 +91,5 @@ if (films.length > FILM_COUNT_PER_STEP) {
 }
 
 render(footerStatisticsElement, new FilmTotalCountView(FILM_COUNT).element, renderPosition.BEFOREEND);
-
-document.body.classList.add('hide-overflow');
-
-const filmPopupViewComponent = new FilmPopupView(films[0]);
-render(siteFooterElement, filmPopupViewComponent.element, renderPosition.AFTEREND);
-
-const filmPopupCloseButton = filmPopupViewComponent.element.querySelector('.film-details__close-btn');
-
-filmPopupCloseButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
-
-  document.body.classList.remove('hide-overflow');
-
-  filmPopupViewComponent.element.remove();
-  filmPopupViewComponent.removeElement();
-});
 
 
