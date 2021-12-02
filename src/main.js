@@ -1,11 +1,11 @@
-import { createUserRankTemplate } from './view/user-rank-view.js';
+import UserRankView from './view/user-rank-view.js';
 import { createFilterTemplate } from './view/filter-view.js';
 import { createSortTemplate } from './view/sort-view.js';
 import { createFilmListTemplate } from './view/film-list-view.js';
 import { createFilmCardTemplate } from './view/film-card-view.js';
 import { createShowMoreButtonTemplate } from './view/show-more-button-view.js';
 import { createFilmTotalCountTemplate } from './view/film-total-count-view.js';
-import { renderTemplate, renderPosition } from './render.js';
+import { renderTemplate, renderPosition, renderElement } from './render.js';
 import { generateFilm } from './mock/film.js';
 import { createFilmPopupTemplate } from './view/film-popup-view.js';
 import { generateFilter } from './mock/filter.js';
@@ -22,7 +22,7 @@ const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 const footerStatisticsElement = document.querySelector('.footer__statistics');
 
-renderTemplate(siteHeaderElement, createUserRankTemplate(watchedFilmCount), renderPosition.BEFOREEND);
+renderElement(siteHeaderElement, new UserRankView(watchedFilmCount).element, renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createFilterTemplate(filters), renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createSortTemplate(), renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createFilmListTemplate(), renderPosition.BEFOREEND);
