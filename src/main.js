@@ -1,5 +1,5 @@
 import UserRankView from './view/user-rank-view.js';
-import { createFilterTemplate } from './view/filter-view.js';
+import FilterView from './view/filter-view.js';
 import SortView from './view/sort-view.js';
 import { createFilmListTemplate } from './view/film-list-view.js';
 import { createFilmCardTemplate } from './view/film-card-view.js';
@@ -23,7 +23,7 @@ const siteFooterElement = document.querySelector('.footer');
 const footerStatisticsElement = document.querySelector('.footer__statistics');
 
 renderElement(siteHeaderElement, new UserRankView(watchedFilmCount).element, renderPosition.BEFOREEND);
-renderTemplate(siteMainElement, createFilterTemplate(filters), renderPosition.BEFOREEND);
+renderElement(siteMainElement, new FilterView(filters).element, renderPosition.BEFOREEND);
 renderElement(siteMainElement, new SortView().element, renderPosition.BEFOREEND);
 renderTemplate(siteMainElement, createFilmListTemplate(), renderPosition.BEFOREEND);
 
