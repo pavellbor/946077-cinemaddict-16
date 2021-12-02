@@ -33,7 +33,7 @@ export default class UserRankView {
   }
 
   get element() {
-    if (this.#element === null) {
+    if (!this.#element) {
       this.#element = createElement(this.template);
     }
 
