@@ -1,7 +1,7 @@
 import UserRankView from './view/user-rank-view.js';
 import FilterView from './view/filter-view.js';
 import SortView from './view/sort-view.js';
-import { createFilmListTemplate } from './view/film-list-view.js';
+import FilmListView from './view/film-list-view.js';
 import { createFilmCardTemplate } from './view/film-card-view.js';
 import ShowMoreButtonView from './view/show-more-button-view.js';
 import FilmTotalCountView from './view/film-total-count-view.js';
@@ -25,7 +25,7 @@ const footerStatisticsElement = document.querySelector('.footer__statistics');
 renderElement(siteHeaderElement, new UserRankView(watchedFilmCount).element, renderPosition.BEFOREEND);
 renderElement(siteMainElement, new FilterView(filters).element, renderPosition.BEFOREEND);
 renderElement(siteMainElement, new SortView().element, renderPosition.BEFOREEND);
-renderTemplate(siteMainElement, createFilmListTemplate(), renderPosition.BEFOREEND);
+renderElement(siteMainElement, new FilmListView().element, renderPosition.BEFOREEND);
 
 const filmsListElement = siteMainElement.querySelector('.films-list');
 const filmsListContainerElement = filmsListElement.querySelector('.films-list__container');
