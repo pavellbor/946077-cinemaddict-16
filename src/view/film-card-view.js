@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
-import { humanizeRuntime } from '../utils';
+import { createElement } from '../render.js';
+import { humanizeRuntime } from '../utils.js';
 
-export const createFilmCardTemplate = (film) => {
+const createFilmCardTemplate = (film) => {
   const {
     commentsId,
     filmInfo: {
@@ -58,3 +59,28 @@ export const createFilmCardTemplate = (film) => {
     </div>
   </article>`;
 };
+
+export default class FilmCardView {
+  #element = null;
+  #film = null;
+
+  constructor(film) {
+    this.#film = film;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilmCardTemplate(this.#film);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
