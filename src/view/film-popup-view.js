@@ -1,5 +1,6 @@
-import { generateComment } from '../mock/comment';
-import { humanizeRuntime, humanizeReleaseDate } from '../utils';
+import { generateComment } from '../mock/comment.js';
+import { createElement } from '../render.js';
+import { humanizeRuntime, humanizeReleaseDate } from '../utils.js';
 
 const createFilmPopupGenresTemplate = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('\n');
 
@@ -21,7 +22,7 @@ const createFilmPopupCommentsTemplate = (comments) => comments.map((commentItem)
   </li>`;
 }).join('\n');
 
-export const createFilmPopupTemplate = (film) => {
+const createFilmPopupTemplate = (film) => {
   const {
     commentsId,
     filmInfo: {
@@ -181,3 +182,28 @@ export const createFilmPopupTemplate = (film) => {
     </form>
   </section>`;
 };
+
+export default class FilmPopupView {
+  #element = null;
+  #film = null;
+
+  constructor(film) {
+    this.#film = film;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilmPopupTemplate(this.#film);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

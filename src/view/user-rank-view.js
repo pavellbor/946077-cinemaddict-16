@@ -1,3 +1,5 @@
+import { createElement } from '../render.js';
+
 const watchedFilmCountToUserRank = (count) => {
   let userRank = null;
 
@@ -13,7 +15,7 @@ const watchedFilmCountToUserRank = (count) => {
   return userRank;
 };
 
-export const createUserRankTemplate = (watchedFilmCount) => {
+const createUserRankTemplate = (watchedFilmCount) => {
   const userRank = watchedFilmCountToUserRank(watchedFilmCount);
 
   return `<section class="header__profile profile">
@@ -21,3 +23,28 @@ export const createUserRankTemplate = (watchedFilmCount) => {
   <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
 </section>`;
 };
+
+export default class UserRankView {
+  #element = null;
+  #watchedFilmCount = null;
+
+  constructor(watchedFilmCount) {
+    this.#watchedFilmCount = watchedFilmCount;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createUserRankTemplate(this.#watchedFilmCount);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

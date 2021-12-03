@@ -1,3 +1,5 @@
+import { createElement } from '../render.js';
+
 const createFilterItemTemplate = (filter) => {
   const { name, count } = filter;
   const filterName = name[0].toUpperCase() + name.slice(1).toLowerCase();
@@ -5,7 +7,7 @@ const createFilterItemTemplate = (filter) => {
   return `<a href="#${filterName}" class="main-navigation__item">${filterName} <span class="main-navigation__item-count">${count}</span></a>`;
 };
 
-export const createFilterTemplate = (filterItems) => {
+const createFilterTemplate = (filterItems) => {
   const filterItemsTemplate = filterItems
     .map((filter, index) => (index !== 0) ? createFilterItemTemplate(filter) : '')
     .join('\n');
@@ -18,3 +20,28 @@ export const createFilterTemplate = (filterItems) => {
   <a href="#stats" class="main-navigation__additional">Stats</a>
 </nav>`;
 };
+
+export default class FilterView {
+  #element = null;
+  #filters = null;
+
+  constructor(filters) {
+    this.#filters = filters;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilterTemplate(this.#filters);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
