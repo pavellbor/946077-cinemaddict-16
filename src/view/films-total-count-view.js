@@ -1,8 +1,8 @@
 import { createElement } from '../render.js';
 
-const createFilmTotalCountTemplate = (count) => `<p>${count} movies inside</p>`;
+const createFilmsTotalCountTemplate = (count) => `<p>${count} movies inside</p>`;
 
-export default class FilmTotalCountView {
+export default class FilmsTotalCountView {
   #element = null;
   #count = null;
 
@@ -19,7 +19,7 @@ export default class FilmTotalCountView {
   }
 
   get template() {
-    return createFilmTotalCountTemplate(this.#count);
+    return createFilmsTotalCountTemplate(this.#count);
   }
 
   removeElement() {
