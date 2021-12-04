@@ -13,7 +13,7 @@ import { renderPosition, render } from './render.js';
 import { generateFilm } from './mock/film.js';
 import { generateFilter } from './mock/filter.js';
 
-const FILM_COUNT = 20;
+const FILM_COUNT = 0;
 const FILM_COUNT_PER_STEP = 5;
 
 const films = Array.from({ length: FILM_COUNT }, generateFilm);
@@ -72,39 +72,37 @@ const renderFilmsList = (container, listFilms, listFilters) => {
 
   render(filmsListComponent.element, new FilmsListTitleView(activeFilter).element, renderPosition.AFTERBEGIN);
 
-  if (activeFilter.count === 0) {
-    return;
-  }
+  if (activeFilter.count > 0) {
+    const filmsListContainerComponent = new FilmsListContainerView();
 
-  const filmsListContainerComponent = new FilmsListContainerView();
+    render(filmsListComponent.element, filmsListContainerComponent.element, renderPosition.BEFOREEND);
 
-  render(filmsListComponent.element, filmsListContainerComponent.element, renderPosition.BEFOREEND);
+    for (let i = 0; i < Math.min(listFilms.length, FILM_COUNT_PER_STEP); i++) {
+      renderFilm(filmsListContainerComponent.element, listFilms[i]);
+    }
 
-  for (let i = 0; i < Math.min(listFilms.length, FILM_COUNT_PER_STEP); i++) {
-    renderFilm(filmsListContainerComponent.element, listFilms[i]);
-  }
+    if (listFilms.length > FILM_COUNT_PER_STEP) {
+      let renderedFilmCount = FILM_COUNT_PER_STEP;
 
-  if (listFilms.length > FILM_COUNT_PER_STEP) {
-    let renderedFilmCount = FILM_COUNT_PER_STEP;
+      const showMoreButtonComponent = new ShowMoreButtonView();
 
-    const showMoreButtonComponent = new ShowMoreButtonView();
+      render(filmsListComponent.element, showMoreButtonComponent.element, renderPosition.BEFOREEND);
 
-    render(filmsListComponent.element, showMoreButtonComponent.element, renderPosition.BEFOREEND);
+      showMoreButtonComponent.element.addEventListener('click', (evt) => {
+        evt.preventDefault();
 
-    showMoreButtonComponent.element.addEventListener('click', (evt) => {
-      evt.preventDefault();
+        listFilms
+          .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP)
+          .forEach((film) => renderFilm(filmsListContainerComponent.element, film));
 
-      listFilms
-        .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP)
-        .forEach((film) => renderFilm(filmsListContainerComponent.element, film));
+        renderedFilmCount += FILM_COUNT_PER_STEP;
 
-      renderedFilmCount += FILM_COUNT_PER_STEP;
-
-      if (renderedFilmCount >= listFilms.length) {
-        showMoreButtonComponent.element.remove();
-        showMoreButtonComponent.removeElement();
-      }
-    });
+        if (renderedFilmCount >= listFilms.length) {
+          showMoreButtonComponent.element.remove();
+          showMoreButtonComponent.removeElement();
+        }
+      });
+    }
   }
 
   render(container, filmsListComponent.element, renderPosition.BEFOREEND);

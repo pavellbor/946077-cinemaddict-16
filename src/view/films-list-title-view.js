@@ -17,10 +17,10 @@ const createFilmsListTitleTemplate = (activeFilter) => {
 
 export default class FilmsListTitleView {
   #element = null;
-  #filters = null;
+  #activeFilter = null;
 
-  constructor(filters) {
-    this.#filters = filters;
+  constructor(activeFilter) {
+    this.#activeFilter = activeFilter;
   }
 
   get element() {
@@ -32,7 +32,7 @@ export default class FilmsListTitleView {
   }
 
   get template() {
-    return createFilmsListTitleTemplate(this.#filters);
+    return createFilmsListTitleTemplate(this.#activeFilter);
   }
 
   removeElement() {
