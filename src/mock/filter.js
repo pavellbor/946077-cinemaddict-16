@@ -6,8 +6,9 @@ const filmToFilterMap = {
 };
 
 export const generateFilter = (films) => Object.entries(filmToFilterMap).map(
-  ([filterName, countFilms]) => ({
+  ([filterName, countFilms], index) => ({
     name: filterName,
     count: countFilms(films),
+    isChecked: index === 0,
   })
 );
