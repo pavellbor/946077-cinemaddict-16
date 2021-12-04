@@ -1,6 +1,6 @@
 import { generateComment } from '../mock/comment.js';
-import { createElement } from '../render.js';
 import { humanizeRuntime, humanizeReleaseDate } from '../utils.js';
+import AbstractView from './abstract-view.js';
 
 const createFilmPopupGenresTemplate = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('\n');
 
@@ -183,27 +183,15 @@ const createFilmPopupTemplate = (film) => {
   </section>`;
 };
 
-export default class FilmPopupView {
-  #element = null;
+export default class FilmPopupView extends AbstractView {
   #film = null;
 
   constructor(film) {
+    super();
     this.#film = film;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createFilmPopupTemplate(this.#film);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

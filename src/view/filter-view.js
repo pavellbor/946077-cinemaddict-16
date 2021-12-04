@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const createFilterCountTemplate = (count) => `<span class="main-navigation__item-count">${count}</span>`;
 
@@ -24,27 +24,15 @@ const createFilterTemplate = (filterItems) => {
 </nav>`;
 };
 
-export default class FilterView {
-  #element = null;
+export default class FilterView extends AbstractView {
   #filters = null;
 
   constructor(filters) {
+    super();
     this.#filters = filters;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createFilterTemplate(this.#filters);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

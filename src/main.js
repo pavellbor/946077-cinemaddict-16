@@ -13,7 +13,7 @@ import { renderPosition, render } from './render.js';
 import { generateFilm } from './mock/film.js';
 import { generateFilter } from './mock/filter.js';
 
-const FILM_COUNT = 0;
+const FILM_COUNT = 20;
 const FILM_COUNT_PER_STEP = 5;
 
 const films = Array.from({ length: FILM_COUNT }, generateFilm);
