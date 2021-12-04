@@ -1,5 +1,5 @@
 import { generateComment } from '../mock/comment.js';
-import { humanizeRuntime, humanizeReleaseDate } from '../utils.js';
+import { formatReleaseDate, formatRuntime } from '../utils/film.js';
 import AbstractView from './abstract-view.js';
 
 const createFilmPopupGenresTemplate = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('\n');
@@ -49,8 +49,8 @@ const createFilmPopupTemplate = (film) => {
 
   const writersList = writers.join(', ');
   const actorsList = actors.join(', ');
-  const humanizedRuntime = humanizeRuntime(runtime);
-  const humanizedReleaseDate = humanizeReleaseDate(releaseDate);
+  const humanizedRuntime = formatRuntime(runtime);
+  const humanizedReleaseDate = formatReleaseDate(releaseDate);
   const genresTemplate = createFilmPopupGenresTemplate(genres);
   const comments = commentsId.map(generateComment);
   const commentCount = comments.length;

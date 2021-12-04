@@ -33,17 +33,3 @@ export const getRandomPastDate = (maxYearsGap = 0, maxDaysGap = 0) => {
 
   return dayjs().subtract(yearsGap, 'year').subtract(daysGap, 'day').subtract(minutesGap, 'minutes').toDate();
 };
-
-export const humanizeRuntime = (runtime = 0) => {
-  const date = dayjs().startOf('day').minute(runtime);
-  const hours = Number(date.format('H'));
-  const minutes = Number(date.format('mm'));
-  const humanizedHours = (hours !== 0) ? `${hours}h` : '';
-  const humanizedMinutes = (minutes !== 0) ? `${minutes}m` : '';
-
-  return `${humanizedHours} ${humanizedMinutes}`.trim();
-};
-
-export const humanizeReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
-
-export const humanizeCommentDate = (commentDate) => dayjs(commentDate).format('YYYY/MM/DD HH:mm');
