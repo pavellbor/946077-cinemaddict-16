@@ -40,25 +40,21 @@ const renderFilm = (container, film) => {
     document.body.classList.remove('hide-overflow');
 
     filmPopupViewComponent.element.remove();
-    filmPopupViewComponent.removeElement();
   };
 
   const onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       closePopup();
-      document.removeEventListener('keydown', onEscKeyDown);
     }
   };
 
-  filmCardComponent.element.querySelector('.film-card__link').addEventListener('click', (evt) => {
-    evt.preventDefault();
+  filmCardComponent.setLinkClickHandler(() => {
     showPopup();
-    document.addEventListener('keydown', onEscKeyDown);
+    document.addEventListener('keydown', onEscKeyDown, { once: true });
   });
 
-  filmPopupViewComponent.element.querySelector('.film-details__close-btn').addEventListener('click', (evt) => {
-    evt.preventDefault();
+  filmPopupViewComponent.setCloseClickHandler(() => {
     closePopup();
     document.removeEventListener('keydown', onEscKeyDown);
   });
@@ -88,9 +84,7 @@ const renderFilmsList = (container, listFilms, listFilters) => {
 
       render(filmsListComponent.element, showMoreButtonComponent.element, renderPosition.BEFOREEND);
 
-      showMoreButtonComponent.element.addEventListener('click', (evt) => {
-        evt.preventDefault();
-
+      showMoreButtonComponent.setClickHandler(() => {
         listFilms
           .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP)
           .forEach((film) => renderFilm(filmsListContainerComponent.element, film));
