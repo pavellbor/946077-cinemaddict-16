@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { getRandomInteger, getRandomItem, shuffle, getRandomItems, getRandomPastDate } from '../utils.js';
+import { getRandomInteger, getRandomItem, shuffle, getRandomItems, getRandomPastDate } from '../utils/common';
 import { POSTERS, AGE_RATING, GENRES, DESCRIPTION, NAMES, COUNTRIES } from '../const.js';
 
 const extractTitleFromPoster = (posterFileName) => {

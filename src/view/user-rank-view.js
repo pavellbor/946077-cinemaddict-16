@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const watchedFilmCountToUserRank = (count) => {
   let userRank = null;
@@ -24,27 +24,15 @@ const createUserRankTemplate = (watchedFilmCount) => {
 </section>`;
 };
 
-export default class UserRankView {
-  #element = null;
+export default class UserRankView extends AbstractView {
   #watchedFilmCount = null;
 
   constructor(watchedFilmCount) {
+    super();
     this.#watchedFilmCount = watchedFilmCount;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createUserRankTemplate(this.#watchedFilmCount);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

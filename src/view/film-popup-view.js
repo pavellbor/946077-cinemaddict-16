@@ -1,6 +1,6 @@
 import { generateComment } from '../mock/comment.js';
-import { createElement } from '../render.js';
-import { humanizeRuntime, humanizeReleaseDate } from '../utils.js';
+import { formatReleaseDate, formatRuntime } from '../utils/film.js';
+import AbstractView from './abstract-view.js';
 
 const createFilmPopupGenresTemplate = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('\n');
 
@@ -49,8 +49,8 @@ const createFilmPopupTemplate = (film) => {
 
   const writersList = writers.join(', ');
   const actorsList = actors.join(', ');
-  const humanizedRuntime = humanizeRuntime(runtime);
-  const humanizedReleaseDate = humanizeReleaseDate(releaseDate);
+  const humanizedRuntime = formatRuntime(runtime);
+  const humanizedReleaseDate = formatReleaseDate(releaseDate);
   const genresTemplate = createFilmPopupGenresTemplate(genres);
   const comments = commentsId.map(generateComment);
   const commentCount = comments.length;
@@ -183,27 +183,25 @@ const createFilmPopupTemplate = (film) => {
   </section>`;
 };
 
-export default class FilmPopupView {
-  #element = null;
+export default class FilmPopupView extends AbstractView {
   #film = null;
 
   constructor(film) {
+    super();
     this.#film = film;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createFilmPopupTemplate(this.#film);
   }
 
-  removeElement() {
-    this.#element = null;
-  }
+  setCloseClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler);
+  };
+
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.closeClick();
+  };
 }

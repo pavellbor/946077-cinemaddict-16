@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { createElement } from '../render.js';
-import { humanizeRuntime } from '../utils.js';
+import { formatRuntime } from '../utils/film.js';
+import AbstractView from './abstract-view.js';
 
 const createFilmCardTemplate = (film) => {
   const {
@@ -22,7 +22,7 @@ const createFilmCardTemplate = (film) => {
   } = film;
 
   const year = dayjs(releaseDate).format('YYYY');
-  const humanizedRuntime = humanizeRuntime(runtime);
+  const humanizedRuntime = formatRuntime(runtime);
   const genre = genres[0];
   const shortDescription = (description.length > 140) ? `${description.slice(0, 139)}...` : description;
   const commentCount = commentsId.length;
@@ -60,27 +60,25 @@ const createFilmCardTemplate = (film) => {
   </article>`;
 };
 
-export default class FilmCardView {
-  #element = null;
+export default class FilmCardView extends AbstractView {
   #film = null;
 
   constructor(film) {
+    super();
     this.#film = film;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createFilmCardTemplate(this.#film);
   }
 
-  removeElement() {
-    this.#element = null;
-  }
+  setLinkClickHandler = (callback) => {
+    this._callback.linkClick = callback;
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#linkClickHandler);
+  };
+
+  #linkClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.linkClick();
+  };
 }
