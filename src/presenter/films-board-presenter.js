@@ -4,7 +4,7 @@ import FilmsListContainerView from '../view/films-list-container-view';
 import FilmCardView from '../view/film-card-view.js';
 import FilmPopupView from '../view/film-popup-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
-import { renderPosition, render } from '../utils/render.js';
+import { renderPosition, render, remove } from '../utils/render.js';
 
 const FILM_COUNT_PER_STEP = 5;
 
@@ -13,10 +13,13 @@ export default class FilmsBoardPresenter {
 
   #filmsListComponent = new FilmsListView();
   #filmsListContainerComponent = new FilmsListContainerView();
+  #showMoreButtonComponent = new ShowMoreButtonView();
+  #filmsListTitleComponent = null;
 
   #films = [];
   #listFilters = [];
   #activeFilter = null;
+  #renderedFilmCount = FILM_COUNT_PER_STEP;
 
   constructor(filmsBoardContainer) {
     this.#filmsBoardContainer = filmsBoardContainer;
@@ -72,28 +75,26 @@ export default class FilmsBoardPresenter {
       .forEach((film) => this.#renderFilm(film));
   };
 
+  #handleLoadMoreButtonClick = () => {
+    this.#renderFilms(this.#renderedFilmCount, this.#renderedFilmCount + FILM_COUNT_PER_STEP);
+
+    this.#renderedFilmCount += FILM_COUNT_PER_STEP;
+
+    if (this.#renderedFilmCount >= this.#films.length) {
+      remove(this.#showMoreButtonComponent);
+    }
+  };
+
   #renderLoadMoreButton = () => {
-    let renderedFilmCount = FILM_COUNT_PER_STEP;
-    const showMoreButtonComponent = new ShowMoreButtonView();
+    render(this.#filmsListComponent, this.#showMoreButtonComponent, renderPosition.BEFOREEND);
 
-    render(this.#filmsListComponent, showMoreButtonComponent, renderPosition.BEFOREEND);
-
-    showMoreButtonComponent.setClickHandler(() => {
-      this.#renderFilms(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP);
-
-      renderedFilmCount += FILM_COUNT_PER_STEP;
-
-      if (renderedFilmCount >= this.#films.length) {
-        showMoreButtonComponent.element.remove();
-        showMoreButtonComponent.removeElement();
-      }
-    });
+    this.#showMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
   };
 
   #renderFilmsListTitle = () => {
-    const filmsListTitleComponent = new FilmsListTitleView(this.#activeFilter);
+    this.#filmsListTitleComponent = new FilmsListTitleView(this.#activeFilter);
 
-    render(this.#filmsListComponent, filmsListTitleComponent, renderPosition.AFTERBEGIN);
+    render(this.#filmsListComponent, this.#filmsListTitleComponent, renderPosition.AFTERBEGIN);
   };
 
   #renderFilmsListContainer = () => {
