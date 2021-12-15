@@ -1,6 +1,5 @@
 import UserRankView from './view/user-rank-view.js';
 import FilterView from './view/filter-view.js';
-import SortView from './view/sort-view.js';
 import FilmsView from './view/films-view.js';
 import FilmsTotalCountView from './view/films-total-count-view.js';
 import { renderPosition, render } from './utils/render.js';
@@ -28,7 +27,6 @@ const renderUserRank = (container, allFilters) => {
 
 renderUserRank(siteHeaderElement, filters);
 render(siteMainElement, new FilterView(filters), renderPosition.BEFOREEND);
-render(siteMainElement, new SortView(), renderPosition.BEFOREEND);
-filmsBoardPresenter.init(films, filters);
 render(siteMainElement, filmsComponent, renderPosition.BEFOREEND);
+filmsBoardPresenter.init(films, filters);
 render(footerStatisticsElement, new FilmsTotalCountView(FILM_COUNT), renderPosition.BEFOREEND);

@@ -13,3 +13,7 @@ export const formatRuntime = (runtime = 0) => {
 export const formatReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
 
 export const formatCommentDate = (commentDate) => dayjs(commentDate).format('YYYY/MM/DD HH:mm');
+
+export const sortFilmsByDate = (prevFilm, currentFilm) => currentFilm.filmInfo.releaseDate.getTime() - prevFilm.filmInfo.releaseDate.getTime();
+
+export const sortFilmsByRating = (prevFilm, currentFilm) => currentFilm.filmInfo.totalRating - prevFilm.filmInfo.totalRating;
