@@ -42,6 +42,7 @@ export default class FilmPresenter {
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#filmPopupComponent.reset(this.#film, this.#comments);
       this.#closePopup();
     }
   };
@@ -51,12 +52,9 @@ export default class FilmPresenter {
     const prevFilmPopupComponent = this.#filmPopupComponent;
 
     this.#filmCardComponent = new FilmCardView(this.#film);
+    this.#filmPopupComponent = new FilmPopupView(this.#film, this.#comments);
 
-    if (prevFilmPopupComponent === null) {
-      this.#filmPopupComponent = new FilmPopupView(this.#film, this.#comments);
-    }
-
-    if (prevFilmCardComponent === null) {
+    if (prevFilmCardComponent === null && prevFilmPopupComponent === null) {
       render(this.#filmsListContainer, this.#filmCardComponent, renderPosition.BEFOREEND);
       return;
     }
@@ -67,9 +65,9 @@ export default class FilmPresenter {
 
     if (this.#mode === Mode.POPUP) {
       replace(this.#filmCardComponent, prevFilmCardComponent);
-
-      this.#filmPopupComponent.updateData({ ...this.#film, comments: this.#comments });
+      replace(this.#filmPopupComponent, prevFilmPopupComponent);
     }
+
   };
 
   #setEventHandlers = () => {
@@ -103,6 +101,7 @@ export default class FilmPresenter {
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this.#filmPopupComponent.reset(this.#film, this.#comments);
       this.#closePopup();
     }
   };
