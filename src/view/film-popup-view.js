@@ -25,26 +25,22 @@ const createFilmPopupCommentsTemplate = (comments) => comments.map((commentItem)
 const createFilmPopupTemplate = (film) => {
   const {
     commentsId,
-    filmInfo: {
-      title,
-      alternativeTitle,
-      totalRating,
-      poster,
-      ageRating,
-      director,
-      writers,
-      actors,
-      releaseDate,
-      releaseCountry,
-      runtime,
-      genres,
-      description,
-    },
-    userDetails: {
-      isWatchlist,
-      isWatched,
-      isFavorite,
-    },
+    title,
+    alternativeTitle,
+    totalRating,
+    poster,
+    ageRating,
+    director,
+    writers,
+    actors,
+    releaseDate,
+    releaseCountry,
+    runtime,
+    genres,
+    description,
+    isWatchlist,
+    isWatched,
+    isFavorite,
   } = film;
 
   const writersList = writers.join(', ');
