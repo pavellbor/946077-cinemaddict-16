@@ -1,6 +1,8 @@
 import FilmCardView from '../view/film-card-view.js';
 import FilmPopupView from '../view/film-popup-view.js';
 import { renderPosition, render, replace, remove } from '../utils/render.js';
+import { generateComment } from '../mock/comment.js';
+import { nanoid } from 'nanoid';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -16,6 +18,7 @@ export default class FilmPresenter {
   #filmPopupComponent = null;
 
   #film = null;
+  #comments = [];
   #mode = Mode.DEFAULT;
 
   constructor(filmsListContainer, changeData, changeMode) {
@@ -24,8 +27,9 @@ export default class FilmPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (film) => {
+  init = (film, comments) => {
     this.#film = film;
+    this.#comments = comments || film.commentsId.map(generateComment);
 
     this.#renderFilm();
     this.#setEventHandlers();
@@ -47,9 +51,12 @@ export default class FilmPresenter {
     const prevFilmPopupComponent = this.#filmPopupComponent;
 
     this.#filmCardComponent = new FilmCardView(this.#film);
-    this.#filmPopupComponent = new FilmPopupView(this.#film);
 
-    if (prevFilmCardComponent === null && prevFilmPopupComponent === null) {
+    if (prevFilmPopupComponent === null) {
+      this.#filmPopupComponent = new FilmPopupView(this.#film, this.#comments);
+    }
+
+    if (prevFilmCardComponent === null) {
       render(this.#filmsListContainer, this.#filmCardComponent, renderPosition.BEFOREEND);
       return;
     }
@@ -60,7 +67,8 @@ export default class FilmPresenter {
 
     if (this.#mode === Mode.POPUP) {
       replace(this.#filmCardComponent, prevFilmCardComponent);
-      replace(this.#filmPopupComponent, prevFilmPopupComponent);
+
+      this.#filmPopupComponent.updateData({ ...this.#film, comments: this.#comments });
     }
   };
 
@@ -74,6 +82,7 @@ export default class FilmPresenter {
     this.#filmPopupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#filmPopupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#filmPopupComponent.setCloseClickHandler(this.#handleCloseClick);
+    this.#filmPopupComponent.setCommentAddHandler(this.#handleCommentAdd);
   };
 
   #showPopup = () => {
@@ -85,6 +94,8 @@ export default class FilmPresenter {
 
   #closePopup = () => {
     document.body.classList.remove('hide-overflow');
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+
     this.#filmPopupComponent.element.remove();
     this.#mode = Mode.DEFAULT;
   };
@@ -98,7 +109,7 @@ export default class FilmPresenter {
 
   #handleLinkClick = () => {
     this.#showPopup();
-    document.addEventListener('keydown', this.#onEscKeyDown, { once: true });
+    document.addEventListener('keydown', this.#onEscKeyDown);
   };
 
   #handleCloseClick = () => {
@@ -116,5 +127,13 @@ export default class FilmPresenter {
 
   #handleFavoriteClick = () => {
     this.#changeData({ ...this.#film, isFavorite: !this.#film.isFavorite });
+  };
+
+  #handleCommentAdd = (comment) => {
+    const newComment = { ...generateComment(nanoid()), comment };
+
+    this.#comments.slice().push(newComment);
+
+    this.#changeData({ ...this.#film, commentsId: [...this.#film.commentsId, newComment.id] });
   };
 }
