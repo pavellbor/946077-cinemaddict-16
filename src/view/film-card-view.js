@@ -5,20 +5,16 @@ import AbstractView from './abstract-view.js';
 const createFilmCardTemplate = (film) => {
   const {
     commentsId,
-    filmInfo: {
-      title,
-      totalRating,
-      poster,
-      releaseDate,
-      runtime,
-      genres,
-      description,
-    },
-    userDetails: {
-      isWatchlist,
-      isWatched,
-      isFavorite,
-    },
+    title,
+    totalRating,
+    poster,
+    releaseDate,
+    runtime,
+    genres,
+    description,
+    isWatchlist,
+    isWatched,
+    isFavorite,
   } = film;
 
   const year = dayjs(releaseDate).format('YYYY');
@@ -110,5 +106,5 @@ export default class FilmCardView extends AbstractView {
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
-  }
+  };
 }
