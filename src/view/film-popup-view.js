@@ -1,26 +1,31 @@
 import { EMOTIONS } from '../const.js';
-import { formatReleaseDate, formatRuntime } from '../utils/film.js';
+import { formatCommentDate, formatReleaseDate, formatRuntime, sortCommentsByDate } from '../utils/film.js';
 import SmartView from './smart-view.js';
 
 const createFilmPopupGenresTemplate = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('\n');
 
-const createFilmPopupCommentsTemplate = (comments) => comments.map((commentItem) => {
-  const { emotion, comment, author, date } = commentItem;
+const createFilmPopupCommentsTemplate = (comments = []) => comments
+  .slice()
+  .sort(sortCommentsByDate)
+  .map((commentItem) => {
+    const { emotion, comment, author, date } = commentItem;
+    const humanizedCommentDate = formatCommentDate(date);
 
-  return `<li class="film-details__comment">
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${comment}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${date}</span>
-        <button class="film-details__comment-delete">Delete</button>
-      </p>
-    </div>
-  </li>`;
-}).join('\n');
+    return `<li class="film-details__comment">
+      <span class="film-details__comment-emoji">
+        <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
+      </span>
+      <div>
+        <p class="film-details__comment-text">${comment}</p>
+        <p class="film-details__comment-info">
+          <span class="film-details__comment-author">${author}</span>
+          <span class="film-details__comment-day">${humanizedCommentDate}</span>
+          <button class="film-details__comment-delete">Delete</button>
+        </p>
+      </div>
+    </li>`;
+  }).join('\n');
+
 
 const createFilmPopupEmotionsTemplate = (emotions, commentEmotion) => emotions.map((emotion) => {
   const isChecked = (emotion === commentEmotion) ? 'checked' : '';
@@ -203,6 +208,10 @@ export default class FilmPopupView extends SmartView {
     this.setWatchListClickHandler(this._callback.watchListClick);
     this.setCommentAddHandler(this._callback.commentAdd);
     this.#setInnerHandlers();
+  };
+
+  scrollToCommentForm = () => {
+    this.element.querySelector('.film-details__new-comment').scrollIntoView(false);
   };
 
   setCloseClickHandler = (callback) => {

@@ -31,7 +31,7 @@ export const getRandomPastDate = (maxYearsGap = 0, maxDaysGap = 0) => {
   const daysGap = getRandomInteger(0, maxDaysGap);
   const minutesGap = getRandomInteger(0, 1000);
 
-  return dayjs().subtract(yearsGap, 'year').subtract(daysGap, 'day').subtract(minutesGap, 'minutes').toDate();
+  return dayjs().subtract(yearsGap, 'year').subtract(daysGap, 'day').subtract(minutesGap, 'minutes').format();
 };
 
 export const updateItem = (items, update) => {
