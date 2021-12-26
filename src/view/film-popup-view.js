@@ -196,9 +196,13 @@ export default class FilmPopupView extends SmartView {
     return createFilmPopupTemplate(this._data);
   }
 
-  reset = (film, comments) => {
+  restore = (film, comments) => {
     this._data = FilmPopupView.parseFilmToData({ ...film, comments });
     this.updateData(this._data);
+  };
+
+  restoreScrollPosition = () => {
+    this.element.scrollTop = this._data.scrollPosition;
   };
 
   restoreHandlers = () => {
@@ -209,6 +213,11 @@ export default class FilmPopupView extends SmartView {
     this.setCommentAddHandler(this._callback.commentAdd);
     this.#setInnerHandlers();
   };
+
+  // todo
+  get state() {
+    return { ...this._data, scrollPosition: this.element.scrollTop };
+  }
 
   scrollToCommentForm = () => {
     this.element.querySelector('.film-details__new-comment').scrollIntoView(false);
@@ -288,5 +297,12 @@ export default class FilmPopupView extends SmartView {
     }
   };
 
-  static parseFilmToData = (film) => ({ ...film, commentText: '', commentEmotion: null });
+  static parseFilmToData = (film) => ({ commentText: '', commentEmotion: null, ...film });
+  static parseDataToFilm = (data) => {
+    delete film.scrollPosition;
+    delete film.commentText;
+    delete film.commentEmotion;
+
+    return film;
+  };
 }

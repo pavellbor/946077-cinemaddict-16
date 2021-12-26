@@ -3,6 +3,7 @@ import FilmPopupView from '../view/film-popup-view.js';
 import { renderPosition, render, replace, remove } from '../utils/render.js';
 import { generateComment } from '../mock/comment.js';
 import { nanoid } from 'nanoid';
+import { UpdateType, UserAction } from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -18,22 +19,28 @@ export default class FilmPresenter {
   #filmPopupComponent = null;
 
   #film = null;
-  #comments = [];
+  #commentsModel = null;
   #mode = Mode.DEFAULT;
 
-  constructor(filmsListContainer, changeData, changeMode) {
+  constructor(filmsListContainer, changeData, changeMode, commentsModel) {
     this.#filmsListContainer = filmsListContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
+    this.#commentsModel = commentsModel;
+
+    this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
-  init = (film, comments) => {
+  init = (film) => {
     this.#film = film;
-    this.#comments = comments || film.commentsId.map(generateComment);
 
     this.#renderFilm();
     this.#setEventHandlers();
   };
+
+  get comments() {
+    return [...this.#commentsModel.comments].filter(comment => this.#film.commentsId.includes(comment?.id));
+  }
 
   destroy = () => {
     remove(this.#filmCardComponent);
@@ -42,7 +49,7 @@ export default class FilmPresenter {
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
-      this.#filmPopupComponent.reset(this.#film, this.#comments);
+      this.#filmPopupComponent.restore(this.#film, this.comments);
       this.#closePopup();
     }
   };
@@ -55,11 +62,11 @@ export default class FilmPresenter {
 
     if (this.#mode === Mode.POPUP) {
       replace(this.#filmCardComponent, prevFilmCardComponent);
-      this.#filmPopupComponent.updateData({ ...this.#film, comments: this.#comments });
+      this.#filmPopupComponent.updateData({ ...this.#film, comments: this.comments });
       return;
     }
 
-    this.#filmPopupComponent = new FilmPopupView(this.#film, this.#comments);
+    this.#filmPopupComponent = new FilmPopupView(this.#film, this.comments);
 
     if (prevFilmCardComponent === null && prevFilmPopupComponent === null) {
       render(this.#filmsListContainer, this.#filmCardComponent, renderPosition.BEFOREEND);
@@ -84,9 +91,19 @@ export default class FilmPresenter {
     this.#filmPopupComponent.setCommentAddHandler(this.#handleCommentAdd);
   };
 
+  // todo
+  restorePopup = (state) => {
+    this.#filmPopupComponent.restore({...state, ...this.#film}, this.comments);
+    this.#showPopup();
+    this.#filmPopupComponent.restoreScrollPosition();
+  };
+
   #showPopup = () => {
     this.#changeMode();
+
     document.body.classList.add('hide-overflow');
+    document.addEventListener('keydown', this.#onEscKeyDown);
+
     render(document.body, this.#filmPopupComponent, renderPosition.BEFOREEND);
     this.#mode = Mode.POPUP;
   };
@@ -102,7 +119,7 @@ export default class FilmPresenter {
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#filmPopupComponent.reset(this.#film, this.#comments);
+      this.#filmPopupComponent.restore(this.#film, this.comments);
       this.#closePopup();
     }
   };
@@ -113,32 +130,35 @@ export default class FilmPresenter {
     }
 
     this.#showPopup();
-    document.addEventListener('keydown', this.#onEscKeyDown);
   };
 
   #handleCloseClick = () => {
     this.#closePopup();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #handleWatchListClick = () => {
-    this.#changeData({ ...this.#film, isWatchlist: !this.#film.isWatchlist });
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, { ...this.#film, isWatchlist: !this.#film.isWatchlist }, (this.#mode === Mode.POPUP) && this.#filmPopupComponent.state);
   };
 
   #handleWatchedClick = () => {
-    this.#changeData({ ...this.#film, isWatched: !this.#film.isWatched });
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, { ...this.#film, isWatched: !this.#film.isWatched }, (this.#mode === Mode.POPUP) && this.#filmPopupComponent.state);
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({ ...this.#film, isFavorite: !this.#film.isFavorite });
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, { ...this.#film, isFavorite: !this.#film.isFavorite }, (this.#mode === Mode.POPUP) && this.#filmPopupComponent.state);
   };
 
   #handleCommentAdd = (comment) => {
-    const newComment = { ...generateComment(nanoid()), comment };
+    const newComment = { ...generateComment(nanoid()), ...comment };
+    this.#commentsModel.addComment(newComment);
+  };
 
-    this.#comments.push(newComment);
-    this.#changeData({ ...this.#film, commentsId: [...this.#film.commentsId, newComment.id] });
-    this.#filmPopupComponent.reset(this.#film, this.#comments);
-    this.#filmPopupComponent.scrollToCommentForm();
+  #handleModelEvent = (data) => {
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, { ...this.#film, commentsId: [...this.#film.commentsId, data.id] }, (this.#mode === Mode.POPUP) && this.#filmPopupComponent.state);
+  };
+
+  #handleViewAction = (actionType, updateType, data) => {
+    // console.log(actionType, updateType, data);
+
   };
 }
