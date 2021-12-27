@@ -1,4 +1,4 @@
-import AbstractObservable from "../utils/abstract-observable.js";
+import AbstractObservable from '../utils/abstract-observable.js';
 
 export default class CommentsModel extends AbstractObservable {
   #comments = [];
@@ -11,16 +11,16 @@ export default class CommentsModel extends AbstractObservable {
     return this.#comments;
   }
 
-  addComment = (update) => {
+  addComment = (actionType, comment) => {
     this.#comments = [
-      update, ...this.#comments
+      comment, ...this.#comments
     ];
 
-    this._notify(update);
+    this._notify(actionType, comment.id);
   };
 
-  deleteComment = (updateType) => {
-    const index = this.#comments.findIndex((comment) => comment.id === update.id);
+  deleteComment = (actionType, commentId) => {
+    const index = this.#comments.findIndex((comment) => comment.id === commentId);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting task');
@@ -30,6 +30,6 @@ export default class CommentsModel extends AbstractObservable {
       ...this.#comments.slice(0, index), ...this.#comments.slice(index + 1)
     ];
 
-    this._notify(updateType);
+    this._notify(actionType, commentId);
   };
 }

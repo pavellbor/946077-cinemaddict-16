@@ -32,7 +32,8 @@ export default class FilmsBoardPresenter {
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
 
-    this.#filmsModel.addObserver(this.#handleModelEvent);
+    this.#filmsModel.addObserver(this.#handleFilmModelEvent);
+    this.#commentsModel.addObserver(this.#handleCommentModelEvent);
   }
 
   get films() {
@@ -93,9 +94,10 @@ export default class FilmsBoardPresenter {
   };
 
   #renderFilm = (film) => {
-    const filmPresenter = new FilmPresenter(this.#filmsListContainerComponent, this.#handleViewAction, this.#handleModeChange, this.#commentsModel);
+    const filmPresenter = new FilmPresenter(this.#filmsListContainerComponent, this.#handleViewAction, this.#handleModeChange);
+    const comments = [...this.#commentsModel.comments].filter((comment) => film.commentsId.includes(comment.id));
 
-    filmPresenter.init(film);
+    filmPresenter.init(film, comments);
 
     // todo
     if (this.#openedPopupData && this.#openedPopupData.id === film.id) {
@@ -136,14 +138,37 @@ export default class FilmsBoardPresenter {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update);
         break;
+      case UserAction.ADD_COMMENT:
+        this.#commentsModel.addComment(actionType,  update);
+        break;
+      case UserAction.DELETE_COMMENT:
+        this.#commentsModel.deleteComment(actionType, update);
+        break;
     }
   };
 
-  #handleModelEvent = (updateType, data) => {
-    switch (updateType) {
-      case UpdateType.PATCH:
-        this.#filmPresenters.get(data.id).init(data);
+  #handleCommentModelEvent = (actionType, updateId) => {
+    const currentFilm = this.#filmsModel.films.find((film) => film.id === this.#openedPopupData.id);
+    let index = null;
+    let commentsId = null;
+
+    switch (actionType) {
+      case UserAction.ADD_COMMENT:
+        delete this.#openedPopupData.commentText;
+        delete this.#openedPopupData.commentEmotion;
+        this.#filmsModel.updateFilm(UpdateType.MINOR, { ...currentFilm, commentsId: [...currentFilm.commentsId, updateId] });
         break;
+      case UserAction.DELETE_COMMENT:
+        index = [...currentFilm.commentsId].findIndex((commentId) => commentId === updateId);
+        commentsId = [...currentFilm.commentsId.slice(0, index), ...currentFilm.commentsId.slice(index + 1)];
+        this.#filmsModel.updateFilm(UpdateType.MINOR, { ...currentFilm, commentsId });
+        break;
+    }
+
+  };
+
+  #handleFilmModelEvent = (updateType) => {
+    switch (updateType) {
       case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderBoard();
