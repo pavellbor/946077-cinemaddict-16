@@ -1,10 +1,11 @@
+import { FilterType } from '../const.js';
 import AbstractView from './abstract-view.js';
 
 const filterNameToEmptyDescriptionMap = {
-  all: 'There are no movies in our database',
-  watchlist: 'There are no movies to watch now',
-  history: 'There are no watched movies now',
-  favorites: 'There are no favorite movies now',
+  [FilterType.ALL]: 'There are no movies in our database',
+  [FilterType.WATCHLIST]: 'There are no movies to watch now',
+  [FilterType.HISTORY]: 'There are no watched movies now',
+  [FilterType.FAVORITES]: 'There are no favorite movies now',
 };
 
 const createFilmsListTitleTemplate = (activeFilter) => {
