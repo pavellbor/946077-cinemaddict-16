@@ -2,7 +2,7 @@ import FilmsListView from '../view/films-list-view.js';
 import FilmsListTitleView from '../view/films-list-title-view.js';
 import FilmsListContainerView from '../view/films-list-container-view';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
-import { RenderPosition, render, remove } from '../utils/render.js';
+import { RenderPosition, render, remove, replace } from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
 import SortView from '../view/sort-view.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
@@ -86,9 +86,16 @@ export default class FilmsBoardPresenter {
   };
 
   #renderFilmsListTitle = () => {
-    this.#filmsListTitleComponent = new FilmsListTitleView(this.#filterModel.filter);
+    const prevFilmsListTitleComponent = this.#filmsListTitleComponent;
 
-    render(this.#filmsListComponent, this.#filmsListTitleComponent, RenderPosition.AFTERBEGIN);
+    this.#filmsListTitleComponent = new FilmsListTitleView({ type: this.#filterModel.filter, count: this.films.length });
+
+    if (prevFilmsListTitleComponent === null) {
+      render(this.#filmsListComponent, this.#filmsListTitleComponent, RenderPosition.AFTERBEGIN);
+      return;
+    }
+
+    replace(this.#filmsListTitleComponent, prevFilmsListTitleComponent);
   };
 
   #renderFilmsListContainer = () => {
@@ -177,7 +184,7 @@ export default class FilmsBoardPresenter {
   #handleFilmModelEvent = (updateType, update) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#filmPresenters.get(update.id).init(update);
+        this.#filmPresenters.get(update.id).init(update, [...this.#commentsModel.comments].filter((comment) => update.commentsId.includes(comment.id)));
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
