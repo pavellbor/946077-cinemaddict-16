@@ -1,6 +1,6 @@
 import FilmCardView from '../view/film-card-view.js';
 import FilmPopupView from '../view/film-popup-view.js';
-import { renderPosition, render, replace, remove } from '../utils/render.js';
+import { RenderPosition, render, replace, remove } from '../utils/render.js';
 import { generateComment } from '../mock/comment.js';
 import { nanoid } from 'nanoid';
 import { UpdateType, UserAction } from '../const.js';
@@ -63,7 +63,7 @@ export default class FilmPresenter {
     this.#filmPopupComponent = new FilmPopupView(this.#film, this.#comments);
 
     if (prevFilmCardComponent === null && prevFilmPopupComponent === null) {
-      render(this.#filmsListContainer, this.#filmCardComponent, renderPosition.BEFOREEND);
+      render(this.#filmsListContainer, this.#filmCardComponent, RenderPosition.BEFOREEND);
       return;
     }
 
@@ -99,7 +99,7 @@ export default class FilmPresenter {
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
 
-    render(document.body, this.#filmPopupComponent, renderPosition.BEFOREEND);
+    render(document.body, this.#filmPopupComponent, RenderPosition.BEFOREEND);
     this.#mode = Mode.POPUP;
   };
 

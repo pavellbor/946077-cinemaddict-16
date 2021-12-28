@@ -44,3 +44,10 @@ export const Mode = {
   DEFAULT: 'DEFAULT',
   POPUP: 'POPUP'
 };
+
+export const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites'
+};

@@ -2,18 +2,21 @@ import FilmsListView from '../view/films-list-view.js';
 import FilmsListTitleView from '../view/films-list-title-view.js';
 import FilmsListContainerView from '../view/films-list-container-view';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
-import { renderPosition, render, remove } from '../utils/render.js';
+import { RenderPosition, render, remove } from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
 import SortView from '../view/sort-view.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
 import { sortFilmsByDate, sortFilmsByRating } from '../utils/film.js';
+import { filter } from '../utils/filter.js';
 
 const FILM_COUNT_PER_STEP = 5;
 
 export default class FilmsBoardPresenter {
   #filmsBoardContainer = null;
+
   #filmsModel = null;
   #commentsModel = null;
+  #filterModel = null;
 
   #filmsListComponent = new FilmsListView();
   #filmsListContainerComponent = new FilmsListContainerView();
@@ -21,36 +24,39 @@ export default class FilmsBoardPresenter {
   #sortComponent = null;
   #filmsListTitleComponent = null;
 
-  #activeFilter = {};
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenters = new Map;
   #currentSortType = SortType.DEFAULT;
   #openedPopupData = {};
 
-  constructor(filmsBoardContainer, filmsModel, commentsModel) {
+  constructor(filmsBoardContainer, filmsModel, commentsModel, filterModel) {
     this.#filmsBoardContainer = filmsBoardContainer;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
+    this.#filterModel = filterModel;
 
     this.#filmsModel.addObserver(this.#handleFilmModelEvent);
     this.#commentsModel.addObserver(this.#handleCommentModelEvent);
+    this.#filterModel.addObserver(this.#handleFilmModelEvent);
   }
 
   get films() {
+    const filterType = this.#filterModel.filter;
+    const films = this.#filmsModel.films;
+    const filteredFilms = filter[filterType](films);
+
     switch (this.#currentSortType) {
       case SortType.DATE:
-        return [...this.#filmsModel.films].sort(sortFilmsByDate);
+        return filteredFilms.sort(sortFilmsByDate);
       case SortType.RATING:
-        return [...this.#filmsModel.films].sort(sortFilmsByRating);
+        return filteredFilms.sort(sortFilmsByRating);
     }
 
-    return this.#filmsModel.films;
+    return filteredFilms;
   }
 
-  init = (activeFilter) => {
-    this.#activeFilter = activeFilter;
-
-    render(this.#filmsBoardContainer, this.#filmsListComponent, renderPosition.BEFOREEND);
+  init = () => {
+    render(this.#filmsBoardContainer, this.#filmsListComponent, RenderPosition.BEFOREEND);
 
     this.#renderBoard();
   };
@@ -62,7 +68,7 @@ export default class FilmsBoardPresenter {
     this.#renderSort();
     this.#renderFilmsListTitle();
 
-    if (this.#activeFilter.count !== 0) {
+    if (filmCount !== 0) {
       this.#renderFilmsListContainer();
       this.#renderFilms(films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
 
@@ -76,17 +82,17 @@ export default class FilmsBoardPresenter {
     this.#sortComponent = new SortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
 
-    render(this.#filmsBoardContainer, this.#sortComponent, renderPosition.BEFOREBEGIN);
+    render(this.#filmsBoardContainer, this.#sortComponent, RenderPosition.BEFOREBEGIN);
   };
 
   #renderFilmsListTitle = () => {
-    this.#filmsListTitleComponent = new FilmsListTitleView(this.#activeFilter);
+    this.#filmsListTitleComponent = new FilmsListTitleView(this.#filterModel.filter);
 
-    render(this.#filmsListComponent, this.#filmsListTitleComponent, renderPosition.AFTERBEGIN);
+    render(this.#filmsListComponent, this.#filmsListTitleComponent, RenderPosition.AFTERBEGIN);
   };
 
   #renderFilmsListContainer = () => {
-    render(this.#filmsListComponent, this.#filmsListContainerComponent, renderPosition.BEFOREEND);
+    render(this.#filmsListComponent, this.#filmsListContainerComponent, RenderPosition.BEFOREEND);
   };
 
   #renderFilms = (films) => {
@@ -111,7 +117,7 @@ export default class FilmsBoardPresenter {
     this.#showMoreButtonComponent = new ShowMoreButtonView();
     this.#showMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
 
-    render(this.#filmsListComponent, this.#showMoreButtonComponent, renderPosition.BEFOREEND);
+    render(this.#filmsListComponent, this.#showMoreButtonComponent, RenderPosition.BEFOREEND);
   };
 
   #handleLoadMoreButtonClick = () => {
@@ -128,6 +134,7 @@ export default class FilmsBoardPresenter {
   };
 
   #handleModeChange = () => {
+    this.#openedPopupData = {};
     this.#filmPresenters.forEach((presenter) => presenter.resetView());
   };
 
@@ -139,7 +146,7 @@ export default class FilmsBoardPresenter {
         this.#filmsModel.updateFilm(updateType, update);
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(actionType,  update);
+        this.#commentsModel.addComment(actionType, update);
         break;
       case UserAction.DELETE_COMMENT:
         this.#commentsModel.deleteComment(actionType, update);
@@ -156,19 +163,22 @@ export default class FilmsBoardPresenter {
       case UserAction.ADD_COMMENT:
         delete this.#openedPopupData.commentText;
         delete this.#openedPopupData.commentEmotion;
-        this.#filmsModel.updateFilm(UpdateType.MINOR, { ...currentFilm, commentsId: [...currentFilm.commentsId, updateId] });
+        this.#filmsModel.updateFilm(UpdateType.PATCH, { ...currentFilm, commentsId: [...currentFilm.commentsId, updateId] });
         break;
       case UserAction.DELETE_COMMENT:
         index = [...currentFilm.commentsId].findIndex((commentId) => commentId === updateId);
         commentsId = [...currentFilm.commentsId.slice(0, index), ...currentFilm.commentsId.slice(index + 1)];
-        this.#filmsModel.updateFilm(UpdateType.MINOR, { ...currentFilm, commentsId });
+        this.#filmsModel.updateFilm(UpdateType.PATCH, { ...currentFilm, commentsId });
         break;
     }
 
   };
 
-  #handleFilmModelEvent = (updateType) => {
+  #handleFilmModelEvent = (updateType, update) => {
     switch (updateType) {
+      case UpdateType.PATCH:
+        this.#filmPresenters.get(update.id).init(update);
+        break;
       case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderBoard();
