@@ -64,7 +64,7 @@ const createFilmPopupTemplate = (data) => {
 
   const writersList = writers.join(', ');
   const actorsList = actors.join(', ');
-  const humanizedRuntime = formatRuntime(runtime);
+  const humanizedRuntime = formatRuntime(runtime, true);
   const humanizedReleaseDate = formatReleaseDate(releaseDate);
   const genresTemplate = createFilmPopupGenresTemplate(genres);
   const commentCount = commentsId.length;

@@ -4,6 +4,7 @@ import { RenderPosition, render, replace, remove } from '../utils/render.js';
 import { generateComment } from '../mock/comment.js';
 import { nanoid } from 'nanoid';
 import { UpdateType, UserAction } from '../const.js';
+import dayjs from 'dayjs';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -136,7 +137,7 @@ export default class FilmPresenter {
   };
 
   #handleWatchedClick = () => {
-    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, { ...this.#film, isWatched: !this.#film.isWatched }, (this.#mode === Mode.POPUP) && this.#filmPopupComponent.state);
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, { ...this.#film, isWatched: !this.#film.isWatched, watchingDate: dayjs().format() }, (this.#mode === Mode.POPUP) && this.#filmPopupComponent.state);
   };
 
   #handleFavoriteClick = () => {
@@ -146,6 +147,7 @@ export default class FilmPresenter {
   #handleCommentAdd = (comment) => {
     const newComment = { ...generateComment(nanoid()), ...comment };
     this.#changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, newComment, (this.#mode === Mode.POPUP) && this.#filmPopupComponent.state);
+    this.#filmPopupComponent.restore(this.#film, this.#comments);
   };
 
   #handleCommentDelete = (commentId) => {

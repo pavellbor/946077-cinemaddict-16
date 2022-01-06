@@ -18,7 +18,7 @@ const createFilmCardTemplate = (film) => {
   } = film;
 
   const year = dayjs(releaseDate).format('YYYY');
-  const humanizedRuntime = formatRuntime(runtime);
+  const humanizedRuntime = formatRuntime(runtime, true);
   const genre = genres[0];
   const shortDescription = (description.length > 140) ? `${description.slice(0, 139)}...` : description;
   const commentCount = commentsId.length;
