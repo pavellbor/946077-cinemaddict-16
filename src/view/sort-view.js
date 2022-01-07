@@ -16,7 +16,8 @@ const createSortTemplate = (sortType) => {
 export default class SortView extends AbstractView {
   #sortType = null;
 
-  init(sortType) {
+  constructor(sortType) {
+    super();
     this.#sortType = sortType;
   }
 

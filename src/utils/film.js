@@ -28,7 +28,7 @@ export const formatCommentDate = (commentDate) => {
   return dayjs(commentDate).format('YYYY/MM/DD HH:mm');
 };
 
-export const sortFilmsByDate = (prevFilm, currentFilm) => currentFilm.releaseDate.getTime() - prevFilm.releaseDate.getTime();
+export const sortFilmsByDate = (prevFilm, currentFilm) => new Date(currentFilm.releaseDate).getTime() - new Date(prevFilm.releaseDate).getTime();
 
 export const sortFilmsByRating = (prevFilm, currentFilm) => currentFilm.totalRating - prevFilm.totalRating;
 
