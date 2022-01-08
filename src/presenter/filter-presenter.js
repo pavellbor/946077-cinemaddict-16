@@ -54,7 +54,7 @@ export default class FilterPresenter {
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
-      render(this.#filterContainer, this.#filterComponent, RenderPosition.BEFOREEND);
+      render(this.#filterContainer, this.#filterComponent, RenderPosition.AFTERBEGIN);
       return;
     }
 
@@ -62,15 +62,15 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   };
 
+  removeActiveClass = () => {
+    this.#filterComponent.removeActiveClass();
+  }
+
   #handleModelEvent = () => {
     this.init();
   };
 
   #handleFilterTypeChange = (filterType) => {
-    if (this.#filterModel.filter === filterType) {
-      return;
-    }
-
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 }

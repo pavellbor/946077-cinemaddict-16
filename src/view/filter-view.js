@@ -8,7 +8,7 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
   const filterCountTemplate = (type === FilterType.ALL) ? '' : createFilterCountTemplate(count);
   const filterActiveClassName = (type === currentFilterType) ? 'main-navigation__item--active' : '';
 
-  return `<a href="#${type}" class="main-navigation__item ${filterActiveClassName}">${name} ${filterCountTemplate}</a>`;
+  return `<a href="#${type}" class="main-navigation__item ${filterActiveClassName}" data-filter-type="${type}" data-menu-item="${type}">${name} ${filterCountTemplate}</a>`;
 };
 
 const createFilterTemplate = (filterItems, currentFilterType) => {
@@ -16,12 +16,9 @@ const createFilterTemplate = (filterItems, currentFilterType) => {
     .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('\n');
 
-  return `<nav class="main-navigation">
-  <div class="main-navigation__items">
+  return `<div class="main-navigation__items">
     ${filterItemsTemplate}
-  </div>
-  <a href="#stats" class="main-navigation__additional">Stats</a>
-</nav>`;
+  </div>`;
 };
 
 export default class FilterView extends AbstractView {
@@ -38,15 +35,23 @@ export default class FilterView extends AbstractView {
     return createFilterTemplate(this.#filters, this.#currentFilterType);
   }
 
+  removeActiveClass = () => {
+    this.element.querySelector('.main-navigation__item--active').classList.remove('main-navigation__item--active');
+  }
+
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
 
-    window.addEventListener('hashchange', this.#filterTypeChangeHandler);
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
   };
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
 
-    this._callback.filterTypeChange(location.hash.slice(1));
+    if (!evt.target.classList.contains('main-navigation__item')) {
+      return;
+    }
+
+    this._callback.filterTypeChange(evt.target.dataset.filterType);
   };
 }

@@ -1,13 +1,17 @@
 import dayjs from 'dayjs';
 
-export const formatRuntime = (runtime) => {
+export const formatRuntime = (runtime, humanize) => {
   const date = dayjs().startOf('day').minute(runtime);
   const hours = Number(date.format('H'));
   const minutes = Number(date.format('mm'));
   const humanizedHours = (hours !== 0) ? `${hours}h` : '';
   const humanizedMinutes = (minutes !== 0) ? `${minutes}m` : '';
 
-  return `${humanizedHours} ${humanizedMinutes}`.trim();
+  if (humanize) {
+    return `${humanizedHours} ${humanizedMinutes}`.trim();
+  }
+
+  return { hours, minutes };
 };
 
 export const formatReleaseDate = (releaseDate) => dayjs(releaseDate).format('D MMMM YYYY');
