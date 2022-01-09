@@ -8,7 +8,7 @@ export const POSTERS = [
   'the-man-with-the-golden-arm.jpg',
 ];
 
-export const AGE_RATING = ['0+', '6+', '12+', '16+', '18+'];
+export const AGE_RATING = [0, 6, 12, 16, 18];
 
 export const GENRES = ['Comedy', 'Horror', 'Musical', 'Cartoon', 'Western', 'Thriller'];
 
@@ -37,7 +37,8 @@ export const UserAction = {
 export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
-  MAJOR: 'MAJOR'
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const Mode = {
@@ -63,3 +64,7 @@ export const StatisticsFilterType = {
   MONTH: 'month',
   YEAR: 'year'
 };
+
+export const AUTHORIZATION = 'Basic klsadfjaklsfjlkjaf';
+
+export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';

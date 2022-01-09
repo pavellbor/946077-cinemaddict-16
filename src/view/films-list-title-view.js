@@ -6,6 +6,7 @@ const filterNameToEmptyDescriptionMap = {
   [FilterType.WATCHLIST]: 'There are no movies to watch now',
   [FilterType.HISTORY]: 'There are no watched movies now',
   [FilterType.FAVORITES]: 'There are no favorite movies now',
+  LOADING : 'Loading...'
 };
 
 const createFilmsListTitleTemplate = (activeFilter) => {

@@ -40,7 +40,6 @@ const createFilmPopupEmotionsTemplate = (emotions, commentEmotion) => emotions.m
 
 const createFilmPopupTemplate = (data) => {
   const {
-    commentsId,
     comments,
     title,
     alternativeTitle,
@@ -67,7 +66,7 @@ const createFilmPopupTemplate = (data) => {
   const humanizedRuntime = formatRuntime(runtime, true);
   const humanizedReleaseDate = formatReleaseDate(releaseDate);
   const genresTemplate = createFilmPopupGenresTemplate(genres);
-  const commentCount = commentsId.length;
+  const commentCount = comments.length;
 
   const watchlistClassName = isWatchlist
     ? 'film-details__control-button--watchlist film-details__control-button--active'
@@ -95,9 +94,9 @@ const createFilmPopupTemplate = (data) => {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="./images/posters/${poster}" alt="">
+            <img class="film-details__poster-img" src="./${poster}" alt="">
 
-            <p class="film-details__age">${ageRating}</p>
+            <p class="film-details__age">${ageRating}+</p>
           </div>
 
           <div class="film-details__info">

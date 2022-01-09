@@ -15,7 +15,6 @@ export default class FilmsBoardPresenter {
   #filmsBoardContainer = null;
 
   #filmsModel = null;
-  #commentsModel = null;
   #filterModel = null;
 
   #filmsListComponent = null;
@@ -27,14 +26,14 @@ export default class FilmsBoardPresenter {
   #renderedFilmCount = FILM_COUNT_PER_STEP;
   #filmPresenters = new Map;
   #currentSortType = SortType.DEFAULT;
+  #isLoading = true;
   #openedPopupData = {};
 
   #isDestroyed = false;
 
-  constructor(filmsBoardContainer, filmsModel, commentsModel, filterModel) {
+  constructor(filmsBoardContainer, filmsModel, filterModel) {
     this.#filmsBoardContainer = filmsBoardContainer;
     this.#filmsModel = filmsModel;
-    this.#commentsModel = commentsModel;
     this.#filterModel = filterModel;
   }
 
@@ -62,7 +61,6 @@ export default class FilmsBoardPresenter {
     this.#renderBoard();
 
     this.#filmsModel.addObserver(this.#handleFilmModelEvent);
-    this.#commentsModel.addObserver(this.#handleCommentModelEvent);
     this.#filterModel.addObserver(this.#handleFilmModelEvent);
 
     this.#isDestroyed = false;
@@ -75,13 +73,16 @@ export default class FilmsBoardPresenter {
     remove(this.#filmsListComponent);
 
     this.#filmsModel.removeObserver(this.#handleFilmModelEvent);
-    this.#commentsModel.removeObserver(this.#handleCommentModelEvent);
-    // this.#filterModel.removeObserver(this.#handleFilmModelEvent);
 
     this.#isDestroyed = true;
   };
 
   #renderBoard = () => {
+    if (this.#isLoading) {
+      this.#renderFilmsListTitle();
+      return;
+    }
+
     const films = this.films;
     const filmCount = films.length;
 
@@ -106,7 +107,8 @@ export default class FilmsBoardPresenter {
   };
 
   #renderFilmsListTitle = () => {
-    this.#filmsListTitleComponent = new FilmsListTitleView({ type: this.#filterModel.filter, count: this.films.length });
+    const titleData = this.#isLoading ? { type: 'LOADING', count: 0 } : { type: this.#filterModel.filter, count: this.films.length };
+    this.#filmsListTitleComponent = new FilmsListTitleView(titleData);
 
     render(this.#filmsListComponent, this.#filmsListTitleComponent, RenderPosition.AFTERBEGIN);
   };
@@ -121,11 +123,9 @@ export default class FilmsBoardPresenter {
 
   #renderFilm = (film) => {
     const filmPresenter = new FilmPresenter(this.#filmsListContainerComponent, this.#handleViewAction, this.#handleModeChange);
-    const comments = [...this.#commentsModel.comments].filter((comment) => film.commentsId.includes(comment.id));
 
-    filmPresenter.init(film, comments);
+    filmPresenter.init(film);
 
-    // todo
     if (this.#openedPopupData && this.#openedPopupData.id === film.id) {
       filmPresenter.restorePopup(this.#openedPopupData);
     }
@@ -165,40 +165,11 @@ export default class FilmsBoardPresenter {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update);
         break;
-      case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(actionType, update);
-        break;
-      case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(actionType, update);
-        break;
     }
   };
 
-  #handleCommentModelEvent = (actionType, updateId) => {
-    const currentFilm = this.#filmsModel.films.find((film) => film.id === this.#openedPopupData.id);
-    let index = null;
-    let commentsId = null;
-
-    switch (actionType) {
-      case UserAction.ADD_COMMENT:
-        delete this.#openedPopupData.commentText;
-        delete this.#openedPopupData.commentEmotion;
-        this.#filmsModel.updateFilm(UpdateType.PATCH, { ...currentFilm, commentsId: [...currentFilm.commentsId, updateId] });
-        break;
-      case UserAction.DELETE_COMMENT:
-        index = [...currentFilm.commentsId].findIndex((commentId) => commentId === updateId);
-        commentsId = [...currentFilm.commentsId.slice(0, index), ...currentFilm.commentsId.slice(index + 1)];
-        this.#filmsModel.updateFilm(UpdateType.PATCH, { ...currentFilm, commentsId });
-        break;
-    }
-
-  };
-
-  #handleFilmModelEvent = (updateType, update) => {
+  #handleFilmModelEvent = (updateType) => {
     switch (updateType) {
-      case UpdateType.PATCH:
-        this.#filmPresenters.get(update.id).init(update, [...this.#commentsModel.comments].filter((comment) => update.commentsId.includes(comment.id)));
-        break;
       case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderBoard();
@@ -210,6 +181,11 @@ export default class FilmsBoardPresenter {
         }
 
         this.#clearBoard({ resetRenderedFilmCount: true, resetSortType: true });
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#filmsListTitleComponent);
         this.#renderBoard();
         break;
     }
